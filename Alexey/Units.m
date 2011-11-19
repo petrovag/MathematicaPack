@@ -11,6 +11,33 @@
 
 BeginPackage["Alexey`Units`"]
 
+Convert::usage = "Convert[OldUnit,NewUnit] converts old unit to new, 
+	Convert[number ArbitrarySystemOfUnit,NewUnit] converts arb. unit to new
+	Convert[OldUnit,term*SystemOfUnit] converts unit to new system unit push term ."
+
+
+Convert::incompatible="Incompatible units in `1` and `2`.";
+Unit::trivial="Trivial basis of units: `1`";
+ArbUnit::longort="Arb. system of unit `1` must have 3 orts";
+Convert::dre="Attempt conversion of number `1` to unit `2` without 
+	determination anything system of the unit: SU->....";
+Convert::d= "Attempt conversion of number `1` to unit `2` in system
+	non-arbitrary unit";
+
+Unit::usage = "Unit[a,b,c] introduce system of unit with that basis.";
+AddUnit::usage = "AddUnit[unit->old] introduce new unit use old unit,
+option output OutputFormatUnit and TeXFormatUnit may be used";
+
+
+ArbUnit::usage = "ArbUnit[a,b,c] introduce arbitrary system of unit 
+with a,b,c=1, ArbUnit[a->Gram,b,c] make system with variable parameter
+a (dimension length)"
+
+QED::usage = ""
+Atomic::usage = ""
+CGS::usage = ""
+QW::usage = ""
+ToGaussBase::usage = ""
 
 
 (** fundamental SI units usage **)
@@ -64,18 +91,7 @@ N[BoltzmannConstant] = 1.380658 10^-16 Erg/Kelvin;
 
 ct={Centimeter,Gram,Second};
 
-Convert::usage = "Convert[OldUnit,NewUnit] converts old unit to new, 
-	Convert[number ArbitrarySystemOfUnit,NewUnit] converts arb. unit to new
-	Convert[OldUnit,term*SystemOfUnit] converts unit to new system unit push term ."
-
-
-Convert::incompatible="Incompatible units in `1` and `2`.";
-Unit::trivial="Trivial basis of units: `1`";
-ArbUnit::longort="Arb. system of unit `1` must have 3 orts";
-Convert::dre="Attempt conversion of number `1` to unit `2` without 
-	determination anything system of the unit: SU->....";
-Convert::d= "Attempt conversion of number `1` to unit `2` in system
-	non-arbitrary unit";
+Begin["`Private`"]
 
 Convert[old_,new_]:=Module[{t,term},
 If[Head[new]===ToUnits,(* Print["units to system ..."];*)
@@ -108,17 +124,12 @@ Atomic=ArbUnit[ElectronMass,BohrRadius,PlanckConstantReduced];
 CGS=ToUnits[{}];
 QW=ArbUnit[PlanckConstantReduced,WellWidth->Angstrom,Mass->ElectronMass];
 
-Unit::usage = "Unit[a,b,c] introduce system of unit with that basis.";
 
 Unit[basis___]:=Module[{x}, Off[Solve::svars] ; 
     If[Length[{basis}]==3,
 	   x=Solve[({basis}/.ToGauss)=={basis},ct];
 	   If[Length[x]==0,Message[Unit::trivial ,{basis}];Return[]];
 	   On[Solve::svars] ; Return[ToUnits[Last[x]]]]]
-
-ArbUnit::usage = "ArbUnit[a,b,c] introduce arbitrary system of unit 
-with a,b,c=1, ArbUnit[a->Gram,b,c] make system with variable parameter
-a (dimension length)"
 
 ArbUnit[basis___]:=Module[{x,bus,subst},
  	If[Length[{basis}]!=3,Message[ArbUnit::longort ,basis];Return[]];
@@ -132,9 +143,6 @@ ArbUnit[basis___]:=Module[{x,bus,subst},
 		x=Solve[N[bas/.ToGauss]=={1,1,1},ct][[1]]];	
 Return[ToUnits[x]]]	
 
-AddUnit::usage = "AddUnit[unit->old] introduce new unit use old unit,
-option output OutputFormatUnit and TeXFormatUnit may be used";
-
 AddUnit[unit_->across_,opts___]:=Module[{ofo,tft},
 	ToGaussBase=Append[ToGaussBase,unit->(across/.ToGauss)];
 	ToGauss=Dispatch[ToGaussBase];
@@ -143,6 +151,7 @@ AddUnit[unit_->across_,opts___]:=Module[{ofo,tft},
 	If[tft!=TeXFormatUnit,Format[unit,TeXFormat]:=tft];
 	]
 SetAttributes[AddUnit,Listable]
+End[]
 EndPackage[]
 
 
