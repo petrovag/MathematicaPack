@@ -33,11 +33,11 @@ ArbUnit::usage = "ArbUnit[a,b,c] introduce arbitrary system of unit
 with a,b,c=1, ArbUnit[a->Gram,b,c] make system with variable parameter
 a (dimension length)"
 
-QED::usage = ""
-Atomic::usage = ""
-CGS::usage = ""
-QW::usage = ""
-ToGaussBase::usage = ""
+QED::usage = "Квантовая система единиц"
+Atomic::usage = "Атомная система единиц"
+CGS::usage = "СГС"
+QW::usage = "Система ежиниц с заданной длиной, массой и постоянной планка"
+ToGaussBase::usage = "Набор правил для для конверсии в гауссову систему единиц"
 
 
 (** fundamental SI units usage **)
