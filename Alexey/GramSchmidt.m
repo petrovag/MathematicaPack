@@ -8,7 +8,7 @@ GramSchmidt::usage="Procedure of the orthogonalisation for matrix of eighenvalue
 
 
 
-ProjectionO[v1_,v2_]:=(v1.v2*v2)/v2.v2;
+ProjectionO[v1_,v2_]:=(Conjugate[v1].v2*v2)/Conjugate[v2].v2;
 MultipleProjection[v1_,vecs_]:=Plus@@(ProjectionO[v1,#1]&)/@vecs;
 GramSchmidt[mat_]:=Fold[Join[#1,{#2-MultipleProjection[#2,#1]}]&,{},mat];
 
