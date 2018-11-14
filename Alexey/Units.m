@@ -3,7 +3,7 @@
 (* :Title: *)
 (* :Author:  *)
 (* :Summary: *)
-(* :Package Version: 0.5 *)
+(* :Package Version: 0.7 *)
 (* :Context: Alexey`Units` *)
 (* :Keywords: *)
 (* :Limitation: None. *)
@@ -71,35 +71,44 @@ Kelvin -> 1.38 10^-16 Centimeter^2 Gram/Second^2
 	};
 ToGauss=Dispatch[ToGaussBase];
 
-N[SpeedOfLight] = 2.99792458 10^10 Centimeter/Second;
-N[PlanckConstant] = 6.6260755 10.^-27 Gram (Centimeter/Second)^2 Second;
-N[PlanckConstantReduced] = 6.6260755 10.^-27 Gram (Centimeter/Second)^2 Second/ (2 Pi);
-N[ElectronCharge] =4.8032 10^-10 Centimeter^(3/2)Gram^(1/2)/Second;
-N[ElectronMass] = 9.1093897 10^-28 Gram;
-N[ProtonMass] = 1.6726231 10^-24 Gram;
-N[FineStructureConstant] = 1/137.0359895;
-N[PlanckMass] = 2.17671 10^-5 Gram;
-N[BohrRadius] = 0.529177249 10^-8 Centimeter;
-N[RydbergConstant] = 109737.318  Centimeter^-1;
-N[ElectronComptonWavelength] = 2.426309 10^-10 Centimeter;
-N[ClassicalElectronRadius] = 2.817938 10^-13 Centimeter;
-N[ElectronMagneticMoment] = 9.284832 10^-21 Gram (Centimeter/Second)^2/Gauss;
-N[ElectronGFactor] = 1.0011596567;
-N[BorhMagneton] = 9.27408 10^-21 Gram (Centimeter/Second)^2/Gauss;
-N[MagneticFluxQuantum] = 2.0678506 10^-15*3.34 10^-13 Centimeter^(3/2)Gram^(1/2)/Second;
-N[BoltzmannConstant] = 1.380658 10^-16 Erg/Kelvin;
+If[Not[ListQ[$Assumptions]], $Assumptions = {}]
+AppendTo[$Assumptions,Centimeter>0];
+AppendTo[$Assumptions,Second>0];
+AppendTo[$Assumptions,Gram>0];
+AppendTo[$Assumptions,Kelvin>0];
+AppendTo[$Assumptions,Erg>0];
+AppendTo[$Assumptions,Gauss];
+AppendTo[$Assumptions,meV>0];
+
+N[SpeedOfLight] = 2.99792458 10^10 Centimeter/Second;AppendTo[$Assumptions,SpeedOfLight>0];
+N[PlanckConstant] = 6.6260755 10.^-27 Gram (Centimeter/Second)^2 Second;AppendTo[$Assumptions,PlanckConstant>0];
+N[PlanckConstantReduced] = 6.6260755 10.^-27 Gram (Centimeter/Second)^2 Second/ (2 Pi);AppendTo[$Assumptions,PlanckConstantReduced>0];
+N[\[HBar]] = N[PlanckConstantReduced];AppendTo[$Assumptions,\[HBar]>0];
+N[ElectronCharge] =4.8032 10^-10 Centimeter^(3/2)Gram^(1/2)/Second;AppendTo[$Assumptions,ElectronCharge>0];
+N[ElectronMass] = 9.1093897 10^-28 Gram;AppendTo[$Assumptions,ElectronMass>0];
+N[ProtonMass] = 1.6726231 10^-24 Gram;AppendTo[$Assumptions,ProtonMass>0];
+N[FineStructureConstant] = 1/137.0359895;AppendTo[$Assumptions,FineStructureConstant>0];
+N[PlanckMass] = 2.17671 10^-5 Gram;AppendTo[$Assumptions,PlanckMass>0];
+N[BohrRadius] = 0.529177249 10^-8 Centimeter;AppendTo[$Assumptions,BohrRadius>0];
+N[RydbergConstant] = 109737.318  Centimeter^-1;AppendTo[$Assumptions,RydbergConstant>0];
+N[ElectronComptonWavelength] = 2.426309 10^-10 Centimeter;AppendTo[$Assumptions,ElectronComptonWavelength>0];
+N[ClassicalElectronRadius] = 2.817938 10^-13 Centimeter;AppendTo[$Assumptions,ClassicalElectronRadius>0];
+N[ElectronMagneticMoment] = 9.284832 10^-21 Gram (Centimeter/Second)^2/Gauss;AppendTo[$Assumptions,ElectronMagneticMoment>0];
+N[ElectronGFactor] = 1.0011596567;AppendTo[$Assumptions,ElectronGFactor>0];
+N[BorhMagneton] = 9.27408 10^-21 Gram (Centimeter/Second)^2/Gauss;AppendTo[$Assumptions,BorhMagneton>0];
+N[MagneticFluxQuantum] = 2.0678506 10^-15*3.34 10^-13 Centimeter^(3/2)Gram^(1/2)/Second;AppendTo[$Assumptions,MagneticFluxQuantum>0];
+N[BoltzmannConstant] = 1.380658 10^-16 Erg/Kelvin;AppendTo[$Assumptions,BoltzmannConstant>0];
 
 ct={Centimeter,Gram,Second};
-
 Begin["`Private`"]
 
 Convert[old_,new_]:=Module[{t,term},
 If[Head[new]===ToUnits,(* Print["units to system ..."];*)
-	t=Cancel[(old/.ToGauss)/.new[[1]]];Return[t],	
+	t=Cancel[(N[old]/.ToGauss)/.new[[1]]];Return[t],	
 	If[MemberQ[new,_ToUnits],(*Print["units to system with prefix term="];*)
 		term=new/.{_ToUnits->1};(* Print["=prefix term=    ",term];*)
 		t=(new/term)[[1]];(*Print["conversion rule=    ",t];*)
-		t=Cancel[term ((old/.ToGauss)/.t)/((term/.ToGauss))/.t];(*Print[t];*)
+		t=Cancel@PowerExpand@Simplify[term ((N[old]/.ToGauss)/.t)/((term/.ToGauss))/.t,{Centimeter>0,Gram>0,Second>0}];(*Print[t];*)
 		Return[t],
 
 
@@ -108,7 +117,7 @@ If[Head[new]===ToUnits,(* Print["units to system ..."];*)
 			t=Cases[old,_ToUnits][[1]][[1]];(*Print["conversion rule=    ",t];*)
 			If[!NumberQ[term],Message[Convert::d,term,old];Return[]];
 			(* t=new*Cancel[((new/.ToGauss)/.t) ];Return[term*t],*)
-			t=Cancel[new/((new/.ToGauss)/.t) ];Return[term*t],
+			t=Cancel@PowerExpand@Simplify[new/((new/.ToGauss)/.t),{Centimeter>0,Gram>0,Second>0}];Return[term*t],
 			(*Message[Convert::arbsystosys,old,new];Return[old],*)
 			(*Print["units to units ..."];*)
 			t=Cancel[(N[old]/N[new])/.ToGauss];
@@ -132,15 +141,16 @@ Unit[basis___]:=Module[{x}, Off[Solve::svars] ;
 	   On[Solve::svars] ; Return[ToUnits[Last[x]]]]]
 
 ArbUnit[basis___]:=Module[{x,bus,subst},
- 	If[Length[{basis}]!=3,Message[ArbUnit::longort ,basis];Return[]];
-	subst=Cases[{basis},a_Rule]/.ToGauss;	(*Print[subst]; *)
-	bas=({basis}/.Ort[a___]->List[a])/.(Rule[a_,b_]->a);(*Print["bas=",bas];*)
+	If[Length[{basis}]!=3,Message[ArbUnit::longort ,basis];Return[]];
+	subst=Cases[N@{basis},a_Rule]/.ToGauss;	
+	bas=(N@{basis}/.Ort[a___]->List[a])/.(Rule[a_,b_]->a);
 	If[Length[subst]>0,
 		x=(N[{bas}/.subst]/.{_Real->1})[[1]];(*Print["x=",x];*)
-	(* x=Table[If[NumberQ[#[[1]]],Rest[#],#]& @{N[bas/.subst][[i]]} ,{i,3}];Print[x];Print[bas]; *)
-		x=(ct/.Solve[x==bas,ct])[[1]];(*Print[x];*)
+	(* x=Table[If[NumberQ[#[[1]]],Rest[#],#]& @{N[bas/.subst][[i]]} ,{i,3}];*)
+		x=(ct/.Solve[x==bas,ct])[[1]];
 		x=Table[(z:>Cancel[z/(N[y]/.ToGauss)])/.{y->x[[i]],z->ct[[i]]},{i,1,3}],
-		x=Solve[N[bas/.ToGauss]=={1,1,1},ct][[1]]];	
+		x=Solve[N[bas/.ToGauss]=={1.,1.,1.}&&ct[[1]]>0&&ct[[2]]>0&&ct[[3]]>0,ct]];
+		x=First@x;
 Return[ToUnits[x]]]	
 
 AddUnit[unit_->across_,opts___]:=Module[{ofo,tft},
