@@ -17,7 +17,7 @@ EffectiveElectronMassFromEnergy::usage="Effective electron mass \!\(\*FormBox[Su
 TraditionalForm]\) from Energy";
 HoleMass::usage="\:041c\:0430\:0441\:0441\:0430 \:0434\:044b\:0440\:043a\:0438";
 InderecSpinOrbitGapX8\[CapitalGamma]7::usage="InderectSpinOrbitGapX8\[CapitalGamma]7[\"AlGaAs\",x_] Inderect Spin Orbital Gap";
-
+KaneMatrixElement::usage="Kane matrix element";
 
 Begin["`Private`"]
 tri[a_,b_,c_,x_]:=a+b x+c x^2;
@@ -30,6 +30,8 @@ Penetration["Ge",0]=16.;Penetration["Si",0]=11.7;
 
 EffectiveBohrRadius[a_String]:=BohrRadius*Penetration[a,0]*ElectronMass/EffectiveElectronMass[a];
 
+KaneMatrixElement["GaAs"]=22.71 ElectronVolt;
+KaneMatrixElement["InP"]=21.2 ElectronVolt;
 
 FrolichCoefficient[a_String]:=ElectronCharge^2/PlanckConstantReduced Sqrt[2 EffectiveElectronMass[a]/LOPhotonEnergy[a]](1/Penetration[a,Infinity]-1/Penetration[a,0])/2;
 (* \:041f\:043e\:0441\:0442\:043e\:044f\:043d\:043d\:044b\:0435 \:0440\:0435\:0448\:0435\:0442\:043a\:0438 *)
@@ -51,9 +53,10 @@ EnergyGap["GaSb",t_:300 Kelvin]:=(811.3(300 Kelvin-t)+700. t)meV/(300 Kelvin);
 EnergyGap["AlAs",t_:300 Kelvin]:=(3130(300 Kelvin-t)+2950. t)meV/(300 Kelvin);
 EnergyGap["AlSb",t_:300 Kelvin]:=(2320(300 Kelvin-t)+2219. t)meV/(300 Kelvin);
 EnergyGap[a_String,b_String,x_,t_:300 Kelvin]:=(1-x)*EnergyGap[a,t]+x*EnergyGap[b,t];
-EnergyGap["AlGaAs",x_,T_:300 Kelvin]:=600(1.155x+0.37x^2-1.15x(T-300 Kelvin)10^-4)meV;
-EnergyGap["AltGaAs",x_,T_]:=(1424` +1266` x+0266` x^2) meV;
-EnergyGap["AlTGaAs",x_]:=1425 meV+1155 meV x+370 x^2 meV;
+EnergyGap["AlTGaAs",x_,T_:300 Kelvin]:=EnergyGap["GaAs",T]+(1.155 x+0.37 x^2 - 1.15 x (T-300 Kelvin)) ElectronVolt;
+
+EnergyGap["AltGaAs",x_]:=(1424` +1266` x+0266` x^2) meV;
+EnergyGap["AlGaAs",x_,t_:300 Kelvin]:=(1.425 + 1.155 x + 0.37 x^2) ElectronVolt + (3.95 + 1.15 x)(300-t/Kelvin) ElectronVolt/10^4;
 
 
 (* Spin-Orbital splitting*)
@@ -68,7 +71,7 @@ SpinOrbitGap["AlAs",t_:300 Kelvin]:=(275.(300 Kelvin-t)+275. t)meV/(300 Kelvin);
 SpinOrbitGap["AlSb",t_:300 Kelvin]:=(656.(300 Kelvin-t)+750. t)meV/(300 Kelvin);
 SpinOrbitGap[a_String,b_String,x_,t_:300 Kelvin]:=(1-x)*SpinOrbitGap[a,t]+x*SpinOrbitGap[b,t];
 SpinOrbitGap["AlGaAs",x_]:=tri[0.340,-0.131,0.071]ElectronVolt;
-SpinOrbGap["AltGaAs",x_]:=340 meV (1-x)+275 x meV;
+SpinOrbitGap["AltGaAs",x_]:=340 meV (1-x)+275 x meV;
 
 (* \:041d\:0435\:043f\:0440\:044f\:043c\:0430\:044f \:0449\:0435\:043b\:044c (\!\(
 \*SubsuperscriptBox[\(X\), \(8\), \(c\)] - 
@@ -89,9 +92,10 @@ EffectiveElectronMass["GaAs",t_:300 Kelvin]:=(0.0665(300 Kelvin-t)+0.0679 t)Elec
 EffectiveElectronMass["InAs",t_:300 Kelvin]:=(0.023(300 Kelvin-t)+0.027 t)ElectronMass/(300 Kelvin);
 EffectiveElectronMass["InP",t_:300 Kelvin]:=(0.079(300 Kelvin-t)+0.077 t)ElectronMass/(300 Kelvin);
 EffectiveElectronMass["InSb",t_:300 Kelvin]:=(0.0139(300 Kelvin-t)+0.013 t)ElectronMass/(300 Kelvin);
-EffectiveElectronMass["GaSb"]:=0.042 ElectronMass;
-EffectiveElectronMass["AlAs"]:=0.124 ElectronMass;
-EffectiveElectronMass[a_String,b_String,x_,t_:0]:=(1-x)*EffectiveElectronMass[a,t]+x*EffectiveElectronMass[b,t];
+EffectiveElectronMass["GaSb",t_:300 Kelvin]:=0.042 ElectronMass;
+EffectiveElectronMass["AlAs",t_:300 Kelvin]:=0.124 ElectronMass;
+EffectiveElectronMass["AlGaAs",x_]:=(1-x) 0.0679 ElectronMass + x 0.124 ElectronMass;
+EffectiveElectronMass[a_String,b_String,x_,t_:300 Kelvin]:=(1-x)*EffectiveElectronMass[a,t]+x*EffectiveElectronMass[b,t];
 
 EffectiveElectronMassFromConcentrationAndPressure["AlGaAs",x_,n_,P_]:=EffectiveElectronMass["AlGaAs",x] ( 1+7.4 (10^-6) P )/(1-3.9 10^-15 n^(2/3))
 EffectiveElectronMassFromEnergy["AlGaAs",x_,e_]:=EffectiveElectronMass["AlGaAs",x]+(0.0436e+0.236^2 e^2-0.147e^3);
