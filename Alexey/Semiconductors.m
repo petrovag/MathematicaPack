@@ -2,7 +2,7 @@
 
 (* ::Input::Initialization:: *)
 BeginPackage["Alexey`Semiconductors`",{"Alexey`Units`"}]
-Penetration::usage="Penetration[\"GaAs\",0|\[Infinity]] \[LongDash] \:0434\:0438\:044d\:043b\:0435\:043a\:0442\:0440\:0438\:0447\:0435\:0441\:043a\:0430\:044f \:043f\:0440\:043e\:043d\:0438\:0446\:0430\:0435\:043c\:043e\:0441\:0442\:044c \:043c\:0430\:0442\:0435\:0440\:0438\:0430\:043b\:0430";
+Penetration::usage="Penetration[\"GaAs\",0|\[Infinity]] \[LongDash] Penetration";
 EffectiveBohrRadius::usage="Effective Bohr Radius of matherial";
 FrolichCoefficient::usage="Effective Frolich Coefficient";
 EnergyGap::usage="EnergyGap[\"GaAs\"[,\:0442\:0435\:043c\:043f\:0435\:0440\:0430\:0442\:0443\:0440\:0430]]\:0417\:0430\:043f\:0440\:0435\:0449\:0435\:043d\:043d\:0430\:044f \:0437\:043e\:043d\:0430 \:0438\:043b\:0438 EnergyGap[\"\!\(\*SubscriptBox[\(Al\), \(x\)]\)\!\(\*SubscriptBox[\(Ga\), \(1 - x\)]\)As\",x,Temperature]";
@@ -11,11 +11,14 @@ InderectEnergyGapL6\[CapitalGamma]7::usage="InderectEnergyGapX8\[CapitalGamma]7[
 InderectEnergyGapX8\[CapitalGamma]7::usage="InderectEnergyGapX8\[CapitalGamma]7[\"AlGaAs\",x_] Inderect Energy Gap";
 LatticeConstant::usage="Lattice constant";
 EffectiveElectronMass::usage="EffectiveElectronMass[\"GaAs\"[,Temperature]]";
+EffectiveElectronMassLongitual::usage="The Longitual Effective Electron Mass";
+EffectiveElectronMassTransversal::usage="The Longitual Effective Electron Mass";
 EffectiveElectronMassFromConcentrationAndPressure::usage="Effective electron mass \!\(\*FormBox[SubsuperscriptBox[\(\[CapitalGamma]\), \(6\), \(c\)],
 TraditionalForm]\) depends electron concentration and pressure";
 EffectiveElectronMassFromEnergy::usage="Effective electron mass \!\(\*FormBox[SubsuperscriptBox[\(\[CapitalGamma]\), \(6\), \(c\)],
 TraditionalForm]\) from Energy";
-HoleMass::usage="\:041c\:0430\:0441\:0441\:0430 \:0434\:044b\:0440\:043a\:0438";
+HoleMass::usage="The mass of light and heavy holes";
+HoleLuttingerParametes::usage="Luttinger {A,B,C} parameters"; 
 InderecSpinOrbitGapX8\[CapitalGamma]7::usage="InderectSpinOrbitGapX8\[CapitalGamma]7[\"AlGaAs\",x_] Inderect Spin Orbital Gap";
 KaneMatrixElement::usage="Kane matrix element";
 
@@ -26,7 +29,8 @@ Penetration["GaAs",0]=13.18;Penetration["GaAs",Infinity]=10.89;
 Penetration["InSb",0]=17.88;Penetration["InSb",Infinity]=15.68;
 Penetration["InAs",0]=14.55;Penetration["GaAs",Infinity]=11.80;
 Penetration["GaSb",0]=15.69;Penetration["GaSb",Infinity]=14.44;
-Penetration["Ge",0]=16.;Penetration["Si",0]=11.7;
+Penetration["Ge",0]=16.;
+Penetration["Si",0]=11.7;
 
 EffectiveBohrRadius[a_String]:=BohrRadius*Penetration[a,0]*ElectronMass/EffectiveElectronMass[a];
 
@@ -96,6 +100,8 @@ EffectiveElectronMass["GaSb",t_:300 Kelvin]:=0.042 ElectronMass;
 EffectiveElectronMass["AlAs",t_:300 Kelvin]:=0.124 ElectronMass;
 EffectiveElectronMass["AlGaAs",x_]:=(1-x) 0.0679 ElectronMass + x 0.124 ElectronMass;
 EffectiveElectronMass[a_String,b_String,x_,t_:300 Kelvin]:=(1-x)*EffectiveElectronMass[a,t]+x*EffectiveElectronMass[b,t];
+EffectiveElectronMassLongitual["Si",t_:300 Kelvin]=0.9163 ElectronMass;
+EffectiveElectronMassTransversal["Si",t_:300 Kelvin]=0.1905 ElectronMass;
 
 EffectiveElectronMassFromConcentrationAndPressure["AlGaAs",x_,n_,P_]:=EffectiveElectronMass["AlGaAs",x] ( 1+7.4 (10^-6) P )/(1-3.9 10^-15 n^(2/3))
 EffectiveElectronMassFromEnergy["AlGaAs",x_,e_]:=EffectiveElectronMass["AlGaAs",x]+(0.0436e+0.236^2 e^2-0.147e^3);
@@ -111,5 +117,10 @@ HoleMass["AlAs"]={0.066 ElectronMass,0.5 ElectronMass,0};
 HoleMass["AlSb"]={0.11 ElectronMass,{0.4 ElectronMass,0.5 ElectronMass},0};
 HoleMass["GaP"]={0.17 ElectronMass,0.67 ElectronMass,0};
 HoleMass[a_String,b_String,x_]:=(1-x)*HoleMass[a]+x*HoleMass[b];
+HoleMass["Si"]={0.154 ElectronMass, 0.523 ElectronMass};
+
+HoleLuttingerParameters["Si"]={4.28,0.75,4.85};
+HoleLuttingerParameters["Ge"]={13.38,8.48,13.15};
+
 End[];
 EndPackage[]
