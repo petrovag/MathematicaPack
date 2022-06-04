@@ -21,7 +21,8 @@ HoleMass::usage="The mass of light and heavy holes";
 HoleLuttingerParametes::usage="Luttinger {A,B,C} parameters"; 
 InderecSpinOrbitGapX8\[CapitalGamma]7::usage="InderectSpinOrbitGapX8\[CapitalGamma]7[\"AlGaAs\",x_] Inderect Spin Orbital Gap";
 KaneMatrixElement::usage="Kane matrix element";
-
+HoleLuttingerGamma::usage="Luttinger gamma parameters";
+OpticalPhononLongitual::usage="Longitual Optical Phonon energy";
 Begin["`Private`"]
 tri[a_,b_,c_,x_]:=a+b x+c x^2;
 (* \:0414\:0438\:044d\:043b\:0435\:043a\:0442\:0440\:0438\:0447\:0435\:0441\:043a\:0430\:044f \:043f\:0440\:043e\:043d\:0438\:0446\:0430\:0435\:043c\:043e\:0441\:0442\:044c *)
@@ -31,11 +32,18 @@ Penetration["InAs",0]=14.55;Penetration["GaAs",Infinity]=11.80;
 Penetration["GaSb",0]=15.69;Penetration["GaSb",Infinity]=14.44;
 Penetration["Ge",0]=16.;
 Penetration["Si",0]=11.7;
+Penetration["GaAs",0]=12.9; Penetration["GaAs",Infinity]=10.89;
+Penetration["AlAs",0]=10.06; Penetration["AlAs",Infinity]=8.16;
+Penetration["AlGaAs",x_,0]=12.90-2.84 x; 
+Penetration["AlGaAs",x_,Infinity]=10.89-2.73 x; 
 
 EffectiveBohrRadius[a_String]:=BohrRadius*Penetration[a,0]*ElectronMass/EffectiveElectronMass[a];
 
 KaneMatrixElement["GaAs"]=22.71 ElectronVolt;
 KaneMatrixElement["InP"]=21.2 ElectronVolt;
+KaneMatrixElement["InAs"]=22.11 ElectronVolt;
+KaneMatrixElement["InSb"]=22.71 ElectronVolt;
+KaneMatrixElement["GaSb"]=22.82 ElectronVolt;
 
 FrolichCoefficient[a_String]:=ElectronCharge^2/PlanckConstantReduced Sqrt[2 EffectiveElectronMass[a]/LOPhotonEnergy[a]](1/Penetration[a,Infinity]-1/Penetration[a,0])/2;
 (* \:041f\:043e\:0441\:0442\:043e\:044f\:043d\:043d\:044b\:0435 \:0440\:0435\:0448\:0435\:0442\:043a\:0438 *)
@@ -44,6 +52,7 @@ LatticeConstant["InAs"]=6.0583 Angstrom;
 LatticeConstant["InSb"]=6.47937 Angstrom;
 LatticeConstant["GaP"]=5.45117 Angstrom;
 LatticeConstant["GaAs"]=5.65325 Angstrom;
+LatticeConstant["AlGaAs"]=(5.6533+0.0078 x) Angstrom;
 LatticeConstant["AlAs"]=5.660 Angstrom;
 LatticeConstant["AlSb"]=6.1355 Angstrom;
 
@@ -110,7 +119,7 @@ EffectiveElectronMassFromEnergy["AlGaAs",x_,e_]:=EffectiveElectronMass["AlGaAs",
 
 HoleMass["InP"]={0.12 ElectronMass,0.6 ElectronMass,0};
 HoleMass["GaAs"]={0.082 ElectronMass,{0.45 ElectronMass,0.57 ElectronMass},0};
-HoleMass["GaSb"]={{0.047 ElectronMass,0.052ElectronMass},{0.32 ElectronMass,0.40 ElectronMass},0};
+HoleMass["GaSb"]={{0.047 ElectronMass,0.052 ElectronMass},{0.32 ElectronMass,0.40 ElectronMass},0};
 HoleMass["InAs"]={0.026 ElectronMass,0.41 ElectronMass,0};
 HoleMass["InSb"]={0.016 ElectronMass,{0.40 ElectronMass,0.45 ElectronMass},0};
 HoleMass["AlAs"]={0.066 ElectronMass,0.5 ElectronMass,0};
@@ -118,9 +127,18 @@ HoleMass["AlSb"]={0.11 ElectronMass,{0.4 ElectronMass,0.5 ElectronMass},0};
 HoleMass["GaP"]={0.17 ElectronMass,0.67 ElectronMass,0};
 HoleMass[a_String,b_String,x_]:=(1-x)*HoleMass[a]+x*HoleMass[b];
 HoleMass["Si"]={0.154 ElectronMass, 0.523 ElectronMass};
+HoleMass["AlGaAs",x_]:={(0.082+0.068*x) ElectronMass,(0.51+0.25*x) ElectronMass,(0.15+0.09*x) ElectronMass};
+
 
 HoleLuttingerParameters["Si"]={4.28,0.75,4.85};
 HoleLuttingerParameters["Ge"]={13.38,8.48,13.15};
+
+HoleLuttingerGamma["GaAs"]={6.98,2.06,2.93} ;
+HoleLuttingerGamma["AlAs"]={3.76,0.82,1.42} ;
+HoleLuttingerGamma["AlGaAs",x_]:={(6.98-(6.98-3.76)*x) ,(2.06-(2.06-0.82)*x) ,(2.93-(2.93-1.42)*x) } ;
+
+(* Optical phonon *)
+OpticalPhononLongitual["AlGaAs",x_]:=(36.2+1.83x+17.12x^2-5.11x^3) ElectronVolt/1000.;
 
 End[];
 EndPackage[]
